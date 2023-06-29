@@ -3,12 +3,17 @@
 
 import RPi.GPIO as GPIO
 import time
+import spidev
 
 def main():
 	LED = 26
 
+	GPIO.setwarnings(False)
+
 	GPIO.setmode(GPIO.BCM)
 	GPIO.setup(LED,GPIO.OUT)
+
+	spi = spidev.SpiDev()
 
 	try:
 		while True:
@@ -23,4 +28,3 @@ def main():
 
 if __name__=='__main__':
     main()
-
