@@ -1,14 +1,22 @@
+#!/usr/bin/python
+# -*- coding:utf-8 -*-
+
 import spidev as SPI
 import SSD1306
-import time
 
 from PIL import Image,ImageDraw,ImageFont
 
 # Raspberry Pi pin configuration:
+OLED_GPIO_RST = 19
+OLED_GPIO_DC  = 16
+OLED_SPI_BUS  = 0
+OLED_SPI_CS   = 0
+
+# Raspberry Pi pin configuration:
 GPIO_RST = 19
 GPIO_DC  = 16
-SPI_BUS = 0
-SPI_CS  = 0
+SPI_BUS  = 0
+SPI_CS   = 0
 
 # 128x64 display with hardware SPI:
 disp = SSD1306.SSD1306(GPIO_RST, GPIO_DC, SPI.SpiDev(SPI_BUS, SPI_CS))

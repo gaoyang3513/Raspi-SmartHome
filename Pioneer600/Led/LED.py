@@ -5,7 +5,7 @@ import RPi.GPIO as GPIO
 import time
 
 class LED(object):
-	"""class for SSD1306  128*64 0.96inch OLED displays."""
+	"""class for LED."""
 
 	def __init__(self, led):
 		LED = led
@@ -25,3 +25,11 @@ class LED(object):
 			GPIO.output(LED,GPIO.HIGH)
 			GPIO.cleanup()
 
+LED_GPIO_RED  = 26
+
+def main():
+	# 128x64 display with hardware SPI:
+	led  = LED.LED(LED_GPIO_RED)
+
+if __name__=='__main__':
+    main()
