@@ -1,4 +1,4 @@
-import spidev 
+import spidev
 import RPi.GPIO as GPIO
 import time
 
@@ -40,7 +40,7 @@ SSD1306_VERTICAL_AND_LEFT_HORIZONTAL_SCROLL = 0x2A
 
 class SSD1306(object):
 	"""class for SSD1306  128*64 0.96inch OLED displays."""
-	
+
 	def __init__(self,rst,dc,spi):
 		self.width = 128
 		self.height = 64
@@ -70,7 +70,7 @@ class SSD1306(object):
 		self.command(SSD1306_DISPLAYOFF)                    # 0xAE
 		self.command(SSD1306_SETDISPLAYCLOCKDIV)            # 0xD5
 		self.command(0x80)                     # the suggested ra    tio 0x80
-		
+
 		self.command(SSD1306_SETMULTIPLEX)                  # 0xA8
 		self.command(0x3F)
 		self.command(SSD1306_SETDISPLAYOFFSET)              # 0xD3
@@ -82,7 +82,7 @@ class SSD1306(object):
 		else:
 			self.command(0x14)
 		self.command(SSD1306_MEMORYMODE)                    # 0x20
-		self.command(0x00)                            # 0x0 act like ks0108        
+		self.command(0x00)                            # 0x0 act like ks0108
 		self.command(SSD1306_SEGREMAP | 0x1)
 		self.command(SSD1306_COMSCANDEC)
 		self.command(SSD1306_SETCOMPINS)                    # 0xDA
@@ -156,7 +156,7 @@ class SSD1306(object):
 		self.command(contrast)
 
 	def dim(self, dim):
-		"""Adjusts contrast to dim the display if dim is True, 
+		"""Adjusts contrast to dim the display if dim is True,
 		otherwise sets the contrast to normal brightness if dim is False."""
         # Assume dim display.
 		contrast = 0
@@ -166,7 +166,3 @@ class SSD1306(object):
 				contrast = 0x9F
 			else:
 				contrast = 0xCF
-
-
-
-
