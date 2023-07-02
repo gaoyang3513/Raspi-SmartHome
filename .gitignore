@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 # ---> Python
+=======
+>>>>>>> 3f195fd (Initial commit)
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
