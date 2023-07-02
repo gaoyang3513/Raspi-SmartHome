@@ -42,7 +42,7 @@ def main():
 		led_blink = threading.Thread(target=blink_loop, name='led_blink', args=(LED_GPIO_RED,))
 		led_blink.start()
 
-		oled.draw_text(0, 0, 16, 'Hello, workld')
+		oled.draw_text(0, 0, 14, 'Raspi-SmartHome')
 
 		while True:
 			time.sleep(1)
@@ -53,4 +53,3 @@ def main():
 
 if __name__=='__main__':
     main()
-

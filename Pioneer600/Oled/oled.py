@@ -58,7 +58,9 @@ class OLED(object):
 		image = self.image
 
 		# Load default font.
-		font = ImageFont.load_default()
+#		font = ImageFont.load_default()
+		font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+		font = ImageFont.truetype(font_path, size)
 
 		# Write two lines of text.
 		draw.text((x, y), text, font=font, fill=255)
