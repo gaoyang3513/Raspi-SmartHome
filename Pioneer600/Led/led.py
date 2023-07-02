@@ -7,9 +7,9 @@ import time
 class LED(object):
 	"""class for LED."""
 
-	def __init__(self, led):
-		LED = led
+	def __init__(self, gpio):
+		self.gpio = gpio
 
 		GPIO.setwarnings(False)
 		GPIO.setmode(GPIO.BCM)
-		GPIO.setup(LED,GPIO.OUT)
+		GPIO.setup(gpio, GPIO.OUT)

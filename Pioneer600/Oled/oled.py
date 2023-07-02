@@ -2,9 +2,8 @@
 # -*- coding:utf-8 -*-
 
 import spidev as SPI
-import SSD1306
-
 from PIL import Image,ImageDraw,ImageFont
+from . import SSD1306
 
 # Raspberry Pi pin configuration:
 OLED_GPIO_RST = 19
@@ -12,52 +11,58 @@ OLED_GPIO_DC  = 16
 OLED_SPI_BUS  = 0
 OLED_SPI_CS   = 0
 
-# Raspberry Pi pin configuration:
-GPIO_RST = 19
-GPIO_DC  = 16
-SPI_BUS  = 0
-SPI_CS   = 0
+OLED_WIDTH    = 128
+OLED_HEIGHT   = 64
 
-# 128x64 display with hardware SPI:
-disp = SSD1306.SSD1306(GPIO_RST, GPIO_DC, SPI.SpiDev(SPI_BUS, SPI_CS))
+class OLED(object):
+	"""class for OLED."""
 
-# Initialize library.
-disp.begin()
+	def __init__(self, gpio_rst=OLED_GPIO_RST, gpio_dc=OLED_GPIO_DC, spi_bus=OLED_SPI_BUS, spi_cs=OLED_SPI_CS):
+		self.rst  = gpio_rst
+		self.dc   = gpio_dc
+		self.spi  = SPI.SpiDev(spi_bus, spi_cs)
+		self.disp = SSD1306.SSD1306(gpio_rst, gpio_dc, self.spi)
+		self.disp.width  = OLED_WIDTH
+		self.disp.height = OLED_HEIGHT
 
-# Clear display.
-disp.clear()
-disp.display()
+		disp = self.disp
+		# Initialize library.
+		disp.begin()
 
-# Create blank image for drawing.
-# Make sure to create image with mode '1' for 1-bit color.
-width  = disp.width
-height = disp.height
-image = Image.new('1', (width, height))
+		# Clear display.
+		disp.clear()
+		disp.display()
 
-# Get drawing object to draw on image.
-draw = ImageDraw.Draw(image)
+		# Create blank image for drawing.
+		# Make sure to create image with mode '1' for 1-bit color.
+		self.image = Image.new('1', (disp.width, disp.height))
 
-# Draw a black filled box to clear the image.
-draw.rectangle((0,0,width,height), outline=0, fill=0)
+		# Get drawing object to draw on image.
+		self.draw = ImageDraw.Draw(self.image)
 
-# Draw some shapes.
-# First define some constants to allow easy resizing of shapes.
-padding = 2
-shape_width = 20
+	def draw_rectangle(self, x, y, width, height):
+		disp  = self.disp
+		draw  = self.draw
+		image = self.image
 
-top    = padding
-bottom = height - padding
+		# Draw a black filled box to clear the image.
+		draw.rectangle((x, y, width, height), outline=0, fill=0)
 
-# Move left to right keeping track of the current x position for drawing shapes.
-x = padding
-y = top
+		# Display image.
+		disp.image(image)
+		disp.display()
 
-# Load default font.
-font = ImageFont.load_default()
+	def draw_text(self, x, y, size, text):
+		disp  = self.disp
+		draw  = self.draw
+		image = self.image
 
-# Write two lines of text.
-draw.text((x, y), 'Hello, world',  font=font, fill=255)
+		# Load default font.
+		font = ImageFont.load_default()
 
-# Display image.
-disp.image(image)
-disp.display()
+		# Write two lines of text.
+		draw.text((x, y), text, font=font, fill=255)
+
+		# Display image.
+		disp.image(image)
+		disp.display()
