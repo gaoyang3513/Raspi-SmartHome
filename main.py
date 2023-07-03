@@ -10,6 +10,7 @@ import Pioneer600.Led.led   as LED
 import Pioneer600.Oled.oled as OLED
 from PIL import Image,ImageDraw,ImageFont
 import threading
+import socket
 
 # Raspberry Pi pin configuration:
 LED_GPIO_RED  = 26
@@ -18,6 +19,21 @@ OLED_GPIO_RST = 19
 OLED_GPIO_DC  = 16
 OLED_SPI_BUS  = 0
 OLED_SPI_CS   = 0
+
+# 获取本机ip地址
+def get_host_ip():
+    """
+    查询本机ip地址
+    :return: ip
+    """
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+    finally:
+        s.close()
+
+    return ip
 
 # 新线程执行的代码:
 def blink_loop(*args, **kwargs):
@@ -42,7 +58,9 @@ def main():
 		led_blink = threading.Thread(target=blink_loop, name='led_blink', args=(LED_GPIO_RED,))
 		led_blink.start()
 
-		oled.draw_text(0, 0, 14, 'Raspi-SmartHome')
+		Raspi_IP = get_host_ip()
+		oled.draw_text(0,  0, 14, 'Raspi-SmartHome')
+		oled.draw_text(0, 16, 14, 'IP: %s' % Raspi_IP)
 
 		while True:
 			time.sleep(1)
