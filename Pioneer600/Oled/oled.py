@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 
+import os
 import spidev as SPI
 from PIL import Image,ImageDraw,ImageFont
 from . import SSD1306
@@ -59,7 +60,10 @@ class OLED(object):
 
 		# Load default font.
 #		font = ImageFont.load_default()
-		font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+#		font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+#		font_path = os.path.abspath('./Resource/Font/FangZhengFangSongJianTi-1.ttf')
+		font_path = os.path.abspath('./Resource/Font/SanJiKaiShu-2.ttf')
+#		print('Path: %s' % font_path)
 		font = ImageFont.truetype(font_path, size)
 
 		# Write two lines of text.
