@@ -8,7 +8,7 @@ import RPi.GPIO as GPIO
 import spidev as SPI
 import Pioneer600.Led.led       as LED
 import Pioneer600.Oled.oled     as OLED
-import Pioneer600.Sensor.BMP280 as BMP280
+import Pioneer600.Sensor.BMP180 as BMP180
 from PIL import Image,ImageDraw,ImageFont
 import threading
 import socket
@@ -52,7 +52,7 @@ def blink_loop(*args, **kwargs):
 		GPIO.cleanup()
 
 def main():
-	bmp280 = BMP280.BMP180()
+	bmp180 = BMP180.BMP180()
 	led    = LED.LED(LED_GPIO_RED)
 	oled   = OLED.OLED(OLED_GPIO_RST, OLED_GPIO_DC, OLED_SPI_BUS, OLED_SPI_CS)
 
@@ -67,8 +67,11 @@ def main():
 		while True:
 			time.sleep(1)
 
-			temperature,pressure = bmp280.get_temperature_and_pressure()
+			temperature = bmp180.read_temperature()
+			pressure    = bmp180.read_pressure()
+			oled.draw_rectangle(0, 32, 128, 48)
 			oled.draw_text(0, 32, 16, u'温度: %.2f' % temperature)
+			oled.draw_rectangle(0, 48, 128, 64)
 			oled.draw_text(0, 48, 16, u'气压: %.3f' % (pressure/1000))
 
 	except:

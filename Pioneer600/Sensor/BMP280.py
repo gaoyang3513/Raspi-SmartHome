@@ -2,7 +2,7 @@ import time
 from smbus2 import SMBus
 
 # BMP280 address.
-BMP280_I2C_ADDRESS       =    0x77          #SDO = 0
+BMP280_I2C_ADDRESS       =    0x76          #SDO = 0
 
 #Registers  value
 BMP280_ID_Value          =    0x55
@@ -47,8 +47,7 @@ BMP280_DIG_P8_MSB_REG    =    0x9D
 BMP280_DIG_P9_LSB_REG    =    0x9E
 BMP280_DIG_P9_MSB_REG    =    0x9F
 
-
-class BMP180(object):
+class BMP280(object):
 	def __init__(self, address=BMP280_I2C_ADDRESS):
 		self._address = address
 		self._bus     = SMBus(1)
@@ -162,7 +161,7 @@ if __name__ == '__main__':
 
 	print("BMP280 Test Program ...\n")
 
-	bmp280 = BMP180()
+	bmp280 = BMP280()
 
 	while True:
 		time.sleep(1)
