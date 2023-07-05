@@ -68,11 +68,11 @@ def main():
 			temperature = bmp180.read_temperature()
 			pressure    = bmp180.read_pressure()
 			oled.draw_rectangle(0, 32, 128, 64)
-			oled.draw_text(0, 32, 14, u'温度: %.2f' % temperature)
-			oled.draw_text(0, 48, 14, u'气压: %.3f' % (pressure/1000))
+			oled.draw_text(0, 32, 14, u'温度: %.2f℃'  % temperature)
+			oled.draw_text(0, 48, 14, u'气压: %.2fkPa' % (pressure/1000))
 
 			oled.flush()
-			time.sleep(2)
+			time.sleep(1)
 
 	except:
 		print("Except")
