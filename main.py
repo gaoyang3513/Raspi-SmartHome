@@ -65,14 +65,14 @@ def main():
 		oled.draw_text(0, 16, 14, 'IP: %s' % Raspi_IP)
 
 		while True:
-			time.sleep(1)
-
 			temperature = bmp180.read_temperature()
 			pressure    = bmp180.read_pressure()
-			oled.draw_rectangle(0, 32, 128, 48)
-			oled.draw_text(0, 32, 16, u'温度: %.2f' % temperature)
-			oled.draw_rectangle(0, 48, 128, 64)
-			oled.draw_text(0, 48, 16, u'气压: %.3f' % (pressure/1000))
+			oled.draw_rectangle(0, 32, 128, 64)
+			oled.draw_text(0, 32, 14, u'温度: %.2f' % temperature)
+			oled.draw_text(0, 48, 14, u'气压: %.3f' % (pressure/1000))
+
+			oled.flush()
+			time.sleep(2)
 
 	except:
 		print("Except")

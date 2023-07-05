@@ -19,12 +19,16 @@ class OLED(object):
 	"""class for OLED."""
 
 	def __init__(self, gpio_rst=OLED_GPIO_RST, gpio_dc=OLED_GPIO_DC, spi_bus=OLED_SPI_BUS, spi_cs=OLED_SPI_CS):
-		self.rst  = gpio_rst
-		self.dc   = gpio_dc
-		self.spi  = SPI.SpiDev(spi_bus, spi_cs)
-		self.disp = SSD1306.SSD1306(gpio_rst, gpio_dc, self.spi)
+		self.rst       = gpio_rst
+		self.dc        = gpio_dc
+		self.spi       = SPI.SpiDev(spi_bus, spi_cs)
+		self.disp      = SSD1306.SSD1306(gpio_rst, gpio_dc, self.spi)
 		self.disp.width  = OLED_WIDTH
 		self.disp.height = OLED_HEIGHT
+
+		# Load default font.
+		self.font_size = 14
+		self.font      = ImageFont.truetype(os.path.abspath('./Resource/Font/ZiTiGuanJiaFangSongTi-2.ttf'), self.font_size)
 
 		disp = self.disp
 		# Initialize library.
@@ -49,25 +53,15 @@ class OLED(object):
 		# Draw a black filled box to clear the image.
 		draw.rectangle((x, y, width, height), outline=0, fill=0)
 
-		# Display image.
-		disp.image(image)
-		disp.display()
-
 	def draw_text(self, x, y, size, text):
-		disp  = self.disp
 		draw  = self.draw
-		image = self.image
-
-		# Load default font.
-#		font = ImageFont.load_default()
-#		font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
-#		font_path = os.path.abspath('./Resource/Font/FangZhengFangSongJianTi-1.ttf')
-		font_path = os.path.abspath('./Resource/Font/SanJiKaiShu-2.ttf')
-#		print('Path: %s' % font_path)
-		font = ImageFont.truetype(font_path, size)
 
 		# Write two lines of text.
-		draw.text((x, y), text, font=font, fill=255)
+		draw.text((x, y), text, font=self.font, fill=255)
+
+	def flush(self):
+		disp  = self.disp
+		image = self.image
 
 		# Display image.
 		disp.image(image)
