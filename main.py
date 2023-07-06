@@ -8,7 +8,8 @@ import RPi.GPIO as GPIO
 import spidev as SPI
 import Pioneer600.Led.led       as LED
 import Pioneer600.Oled.oled     as OLED
-import Pioneer600.Sensor.BMP180 as BMP180
+import Pioneer600.Sensor.bmp180 as BMP180
+import Pioneer600.Exio.pcf8574  as PCF8574
 from PIL import Image,ImageDraw,ImageFont
 import threading
 import socket
@@ -55,6 +56,7 @@ def main():
 	bmp180 = BMP180.BMP180()
 	led    = LED.LED(LED_GPIO_RED)
 	oled   = OLED.OLED(OLED_GPIO_RST, OLED_GPIO_DC, OLED_SPI_BUS, OLED_SPI_CS)
+	pcf875 = PCF8574.PCF8574(1, 32, KEY_A=1, KEY_B=1, KEY_C=1, KEY_D=1, LED2=1, L3=0, L4=0, BUZZ=1)
 
 	try:
 		led_blink = threading.Thread(target=blink_loop, name='led_blink', args=(LED_GPIO_RED,))
@@ -70,8 +72,13 @@ def main():
 			oled.draw_rectangle(0, 32, 128, 64)
 			oled.draw_text(0, 32, 14, u'温度: %.2f℃'  % temperature)
 			oled.draw_text(0, 48, 14, u'气压: %.2fkPa' % (pressure/1000))
-
 			oled.flush()
+
+			pcf875.restore()
+			is_key_up = pcf875.get_val('KEY_A')
+			pcf875.set_val('LED2', is_key_up)
+			print('Key A: %u' % is_key_up)
+
 			time.sleep(1)
 
 	except:
