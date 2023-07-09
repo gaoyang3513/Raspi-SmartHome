@@ -56,21 +56,33 @@ def blink_loop(*args, **kwargs):
 		GPIO.output(args, GPIO.HIGH)
 		GPIO.cleanup()
 
-pcf8574_in    = {'KEY_A':1, 'KEY_B':1, 'KEY_C':1, 'KEY_D':1}
+pcf8574_in    = {'KEY_L':1, 'KEY_U':1, 'KEY_D':1, 'KEY_R':1}
 pcf8574_out   = {'LED2':1,  'L3':0,    'L4':0,    'BUZZ':1}
 pcf8574_ports = {**pcf8574_in, **pcf8574_out}
 
-def pcf8574_callbak(*args, **kwargs) :
-	print('Port val: %X' % args)
+def pcf8574_callbak(port_val) :
+	#print('Port val: %X' % port_val)
+
+	i = 0
+	for p in pcf8574_ports :
+		if (p in pcf8574_in) :
+			if port_val & (1 << i) == 0 :
+				press_keys.append(p)
+		i = i + 1
+
 	GPIO.output(GPIO_LED_RED, 1)
 	time.sleep(0.2)
 	GPIO.output(GPIO_LED_RED, 0)
 
+oled = OLED.OLED(OLED_GPIO_RST, OLED_GPIO_DC, OLED_SPI_BUS, OLED_SPI_CS)
+press_keys = []
+
 def main():
+	global press_keys
+
 	bmp180 = BMP180.BMP180()
-#	led    = LED.LED(GPIO_LED_RED)
-	oled   = OLED.OLED(OLED_GPIO_RST, OLED_GPIO_DC, OLED_SPI_BUS, OLED_SPI_CS)
 	pcf875 = PCF8574.PCF8574(PCF8574_BUS_ID, PCF8574_BUS_ADDR, pcf8574_ports, GPIO_PF8574_INT, pcf8574_callbak)
+#	led    = LED.LED(GPIO_LED_RED)
 
 	GPIO.setup(GPIO_LED_RED, GPIO.OUT)
 
@@ -83,12 +95,27 @@ def main():
 		oled.draw_text(0, 16, 14, 'IP: %s' % Raspi_IP)
 
 		while True:
-			temperature = bmp180.read_temperature()
-			pressure    = bmp180.read_pressure()
-			oled.draw_rectangle(0, 32, 128, 64)
-			oled.draw_text(0, 32, 14, u'温度: %.2f℃'  % temperature)
-			oled.draw_text(0, 48, 14, u'气压: %.2fkPa' % (pressure/1000))
+			if len(press_keys) == 0 :
+				temperature = bmp180.read_temperature()
+				pressure    = bmp180.read_pressure()
+				oled.draw_rectangle(0, 32, 128, 64)
+				oled.draw_text(0, 32, 14, u'温度: %.2f℃'  % temperature)
+				oled.draw_text(0, 48, 14, u'气压: %.2fkPa' % (pressure/1000))
+			if 'KEY_L' in press_keys :
+				oled.draw_rectangle(0, 32, 128, 48)
+				oled.draw_text(0, 32, 14, u'按键: 左')
+			if 'KEY_U' in press_keys :
+				oled.draw_rectangle(0, 32, 128, 48)
+				oled.draw_text(0, 32, 14, u'按键: 上')
+			if 'KEY_D' in press_keys :
+				oled.draw_rectangle(0, 32, 128, 48)
+				oled.draw_text(0, 32, 14, u'按键: 下')
+			if 'KEY_R' in press_keys :
+				oled.draw_rectangle(0, 32, 128, 48)
+				oled.draw_text(0, 32, 14, u'按键: 右')
+
 			oled.flush()
+			press_keys = []
 
 			time.sleep(1)
 
