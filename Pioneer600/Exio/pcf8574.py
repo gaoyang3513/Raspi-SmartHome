@@ -19,7 +19,6 @@ class PCF8574(object):
 			else :
 				port_val &= ~(1 << i)
 			i = i + 1
-		self.bus.write_byte(self.addr, port_val)
 		self.default = port_val
 
 		self.irq = irq

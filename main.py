@@ -13,6 +13,7 @@ import Pioneer600.Exio.pcf8574  as PCF8574
 from PIL import Image,ImageDraw,ImageFont
 import threading
 import socket
+import aht10 as AHT10
 
 # Raspberry Pi pin configuration:
 GPIO_LED_RED    = 26
@@ -29,6 +30,8 @@ PCF8574_BUS_ADDR = 0x20
 pcf8574_in    = {'KEY_L':1, 'KEY_U':1, 'KEY_D':1, 'KEY_R':1}
 pcf8574_out   = {'LED2':1,  'L3':0,    'L4':0,    'BUZZ':1}
 pcf8574_ports = {**pcf8574_in, **pcf8574_out}
+
+AHT10_BUS_ID   = 1
 
 def pcf8574_callbak(port_val) :
 	global press_keys
@@ -84,24 +87,29 @@ def menu_main(press_keys):
 	if 'KEY_D' in press_keys :
 		menu_item = menu_item + 1
 
-	temperature = bmp180.read_temperature()
-	pressure    = bmp180.read_pressure()
+#	temperature = bmp180.read_temperature()
+#	pressure    = bmp180.read_pressure()
+#	oled.draw_text(0, 32, 14, u'气压: %.2fkPa' % (pressure/1000))
+
+	temperature = aht10.temperature()
+	humidity    = aht10.relative_humidity()
 	oled.draw_rectangle(0, 16, 128, 64)
-	oled.draw_text(0, 16, 14, u'温度: %.2f℃'  % temperature)
-	oled.draw_text(0, 32, 14, u'气压: %.2fkPa' % (pressure/1000))
+	oled.draw_text(0, 16, 14, u'温度: %.1f℃' % temperature)
+	oled.draw_text(0, 32, 14, u'湿度: %.1f%%'   % humidity)
 	oled.flush()
 
-menu_list = [['main', menu_main], ['network', menu_network]]
-bmp180 = BMP180.BMP180()
-oled = OLED.OLED(OLED_GPIO_RST, OLED_GPIO_DC, OLED_SPI_BUS, OLED_SPI_CS)
+#bmp180 = BMP180.BMP180()
+oled   = OLED.OLED(OLED_GPIO_RST, OLED_GPIO_DC, OLED_SPI_BUS, OLED_SPI_CS)
+pcf875 = PCF8574.PCF8574(PCF8574_BUS_ID, PCF8574_BUS_ADDR, pcf8574_ports, GPIO_PF8574_INT, pcf8574_callbak)
+aht10  = AHT10.AHT10(AHT10_BUS_ID)
+
 menu_page = 0
 press_keys = []
+menu_list = [['main', menu_main], ['network', menu_network]]
 
 def main():
 	global press_keys
 	global menu_list
-
-	pcf875 = PCF8574.PCF8574(PCF8574_BUS_ID, PCF8574_BUS_ADDR, pcf8574_ports, GPIO_PF8574_INT, pcf8574_callbak)
 
 	GPIO.setup(GPIO_LED_RED, GPIO.OUT)
 
@@ -114,7 +122,7 @@ def main():
 		menu_list[menu_page][1](press_keys)
 		press_keys = []
 
-		time.sleep(1)
+		time.sleep(0.2)
 
 if __name__=='__main__':
     main()
