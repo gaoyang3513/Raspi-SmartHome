@@ -15,12 +15,16 @@ import threading
 import socket
 
 # Raspberry Pi pin configuration:
-LED_GPIO_RED  = 26
+GPIO_LED_RED    = 26
+GPIO_PF8574_INT = 21
 
 OLED_GPIO_RST = 19
 OLED_GPIO_DC  = 16
 OLED_SPI_BUS  = 0
 OLED_SPI_CS   = 0
+
+PCF8574_BUS_ID   = 1
+PCF8574_BUS_ADDR = 0x20
 
 # 获取本机ip地址
 def get_host_ip():
@@ -52,15 +56,27 @@ def blink_loop(*args, **kwargs):
 		GPIO.output(args, GPIO.HIGH)
 		GPIO.cleanup()
 
+pcf8574_in    = {'KEY_A':1, 'KEY_B':1, 'KEY_C':1, 'KEY_D':1}
+pcf8574_out   = {'LED2':1,  'L3':0,    'L4':0,    'BUZZ':1}
+pcf8574_ports = {**pcf8574_in, **pcf8574_out}
+
+def pcf8574_callbak(*args, **kwargs) :
+	print('Port val: %X' % args)
+	GPIO.output(GPIO_LED_RED, 1)
+	time.sleep(0.2)
+	GPIO.output(GPIO_LED_RED, 0)
+
 def main():
 	bmp180 = BMP180.BMP180()
-	led    = LED.LED(LED_GPIO_RED)
+#	led    = LED.LED(GPIO_LED_RED)
 	oled   = OLED.OLED(OLED_GPIO_RST, OLED_GPIO_DC, OLED_SPI_BUS, OLED_SPI_CS)
-	pcf875 = PCF8574.PCF8574(1, 32, KEY_A=1, KEY_B=1, KEY_C=1, KEY_D=1, LED2=1, L3=0, L4=0, BUZZ=1)
+	pcf875 = PCF8574.PCF8574(PCF8574_BUS_ID, PCF8574_BUS_ADDR, pcf8574_ports, GPIO_PF8574_INT, pcf8574_callbak)
+
+	GPIO.setup(GPIO_LED_RED, GPIO.OUT)
 
 	try:
-		led_blink = threading.Thread(target=blink_loop, name='led_blink', args=(LED_GPIO_RED,))
-		led_blink.start()
+#		led_blink = threading.Thread(target=blink_loop, name='led_blink', args=(GPIO_LED_RED,))
+#		led_blink.start()
 
 		Raspi_IP = get_host_ip()
 		oled.draw_text(0,  0, 14, 'Raspi-SmartHome')
@@ -74,16 +90,11 @@ def main():
 			oled.draw_text(0, 48, 14, u'气压: %.2fkPa' % (pressure/1000))
 			oled.flush()
 
-			pcf875.restore()
-			is_key_up = pcf875.get_val('KEY_A')
-			pcf875.set_val('LED2', is_key_up)
-			print('Key A: %u' % is_key_up)
-
 			time.sleep(1)
 
 	except:
 		print("Except")
-		led_blink.join()
+#		led_blink.join()
 
 if __name__=='__main__':
     main()
