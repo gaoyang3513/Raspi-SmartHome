@@ -30,19 +30,23 @@ PCF8574_BUS_ADDR = 0x20
 pcf8574_in    = {'KEY_L':1, 'KEY_U':1, 'KEY_D':1, 'KEY_R':1}
 pcf8574_out   = {'LED2':1,  'L3':0,    'L4':0,    'BUZZ':1}
 pcf8574_ports = {**pcf8574_in, **pcf8574_out}
+key_lock = threading.Lock()
 
 AHT10_BUS_ID   = 1
 
 def pcf8574_callbak(port_val) :
 	global press_keys
+	global key_lock
 	#print('Port val: %X' % port_val)
 
+	key_lock.acquire()
 	i = 0
 	for p in pcf8574_ports :
 		if (p in pcf8574_in) :
 			if port_val & (1 << i) == 0 :
 				press_keys.append(p)
 		i = i + 1
+	key_lock.release()
 
 	GPIO.output(GPIO_LED_RED, 1)
 	time.sleep(0.2)
@@ -110,6 +114,7 @@ menu_list = [['main', menu_main], ['network', menu_network]]
 def main():
 	global press_keys
 	global menu_list
+	global key_lock
 
 	GPIO.setup(GPIO_LED_RED, GPIO.OUT)
 
@@ -119,8 +124,10 @@ def main():
 	print('Menu list size: %u' % len(menu_list))
 
 	while True:
+		key_lock.acquire()
 		menu_list[menu_page][1](press_keys)
 		press_keys = []
+		key_lock.release()
 
 		time.sleep(0.2)
 
